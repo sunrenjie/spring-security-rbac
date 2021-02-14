@@ -3,7 +3,7 @@ package com.example.springsecurityrbac.service;
 import com.example.springsecurityrbac.dao.*;
 import com.example.springsecurityrbac.model.Permission;
 import com.example.springsecurityrbac.model.User;
-import org.mybatis.dynamic.sql.render.RenderingStrategy;
+import org.mybatis.dynamic.sql.render.RenderingStrategies;
 import org.mybatis.dynamic.sql.select.render.SelectStatementProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -33,10 +33,8 @@ public class SecurityUserService implements UserDetailsService {
         SelectStatementProvider selectStatement = select(UserDynamicSqlSupport.id,UserDynamicSqlSupport.username,UserDynamicSqlSupport.password,UserDynamicSqlSupport.locked)
                 .from(UserDynamicSqlSupport.user)
                 .where(UserDynamicSqlSupport.username,isEqualTo(username))
-                .build().render(RenderingStrategy.MYBATIS3);
+                .build().render(RenderingStrategies.MYBATIS3);
 
-        Map<String,Object> parameter = new HashMap<>();
-        parameter.put("#{username}",username);
         User user = userMapper.selectOne(selectStatement);
         if (user == null) throw new UsernameNotFoundException(username);
 
@@ -46,7 +44,7 @@ public class SecurityUserService implements UserDetailsService {
                 .join(UserRoleDynamicSqlSupport.userRole).on(UserRoleDynamicSqlSupport.roleId,equalTo(RolePermissionDynamicSqlSupport.roleId))
                 .where(UserRoleDynamicSqlSupport.userId,isEqualTo(user.getId()))
                 .build()
-                .render(RenderingStrategy.MYBATIS3);
+                .render(RenderingStrategies.MYBATIS3);
         List<Permission> permissions = permissionMapper.selectMany(manyPermission);
         if (!CollectionUtils.isEmpty(permissions)){
             Set<SimpleGrantedAuthority> sga = new HashSet<>();

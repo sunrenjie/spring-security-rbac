@@ -1,6 +1,6 @@
 ## Spring Security实现RBAC权限管理
 
-### 一简介
+### 一、简介
 
 在企业应用中，认证和授权是非常重要的一部分内容，业界最出名的两个框架就是大名鼎鼎的
 Shiro和Spring Security。由于Spring Boot非常的流行，选择Spring Security做认证和授权的
@@ -29,6 +29,8 @@ RBAC是Role Based Access Control的缩写，是基于角色的访问控制。一
 + Mybatis-3.4.6
 + Druid
 + Thymeleaf（第一次使用）
++ MySQL（如果要用其他数据库，则需准备并导入相应的sql/rbac.sql）
++ Redis
 
 ### 五、具体实现
 
@@ -56,6 +58,9 @@ spring.thymeleaf.cache=false
 ```
 
 然后，使用Mybatis Generator生成对应的实体和DAO，这里不赘述。
+大致步骤是，在mybatis-generator.xml中额外配置一遍上述数据源，并将sql/rbac.sql导入此MySQL数据库（如果用其他数据库则准备并导入相应的sql），
+然后运行命令```mvn mybatis-generator:generate```。该命令使用xml中指定的表格和类生成方式的定义，还有数据库中各个表格的实际情况，生成相应的类。
+首先这些JAVA文件需要修改行尾符与本工程中其他文件一致（使用dos2unix/unix2dos之类）。另外特别需要指出的是，model类User需要实现UserDetails接口类，所以生成之后需要做相应的修改。
 
 前面的这些都是准备工作，下面就要配置和使用Spring Security了，首先配置登录的页面和
 密码的规则，以及授权使用的技术实现等。我们创建`MyWebSecurityConfig`继承`WebSecurityConfigurerAdapter`
